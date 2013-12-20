@@ -1,0 +1,27 @@
+{
+  "name": "npm-internal",
+  "version": "0.0.1",
+  "description": "Publish npm modules to a private s3 bucket.",
+  "main": "index.js",
+  "bin": {
+    "npm-internal": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mick/npm-internal.git"
+  },
+  "author": "mick@mick.im",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mick/npm-internal/issues"
+  },
+  "homepage": "https://github.com/mick/npm-internal",
+  "dependencies": {
+    "npm": "~1.3.21",
+    "aws-sdk": "~2.0.0-rc3",
+    "rc": "~0.3.2"
+  }
+}
