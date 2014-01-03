@@ -16,7 +16,7 @@ var option = (process.argv.length > 3) ? process.argv[3] : "";
 if(command === "config"){
     promptForConfig()
 }else if(!config.accessKeyId  || !config.secretAccessKey || !config.bucket || !command ){
-    fs.createReadStream('usage.md').on('end', function(){
+    fs.createReadStream(__dirname + '/usage.md').on('end', function(){
         if(command === "publish") promptForConfig(); 
     }).pipe(process.stdout);
 }else if(command === "publish"){
