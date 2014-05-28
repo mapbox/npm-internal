@@ -40,7 +40,7 @@ function packAndDeploy(path){
                         Key: "package/"+(packname).substr(0, packname.length-4)+"-"+hash+".tgz"}
             s3.putObject(opts, function(err, resp){
                 if(err) throw err;
-                console.log("It's Available here:", "http://"+opts.Bucket+".s3.amazonaws.com/"+opts.Key);
+                console.log("It's Available here:", "https://"+opts.Bucket+".s3.amazonaws.com/"+opts.Key);
                 fs.unlinkSync(packname);
             });
         });
