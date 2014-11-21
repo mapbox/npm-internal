@@ -8,6 +8,8 @@ Expects the following Env vars:
   AWS_SECRET_ACCESS_KEY=<secret>
 ```
 
+The AWS authentication variables can also be set up using [mapbox-cli](https://github.com/mapbox/mapbox-cli).
+
 Optional:
 
   `NPMInternalAcl=public-read`  # set object acl on s3
