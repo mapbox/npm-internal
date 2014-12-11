@@ -26,7 +26,7 @@ function packAndDeploy(path){
         npm.commands.pack(path, function(err){
             console.log('Uploading Package to S3')
             var opts = {ACL: process.env.NPMInternalAcl || 'public-read',
-                        Body: fs.readFileSync(packname),
+                        Body: fs.createReadStream(packname),
                         Bucket: process.env.NPMInternalBucket,
                         Key: 'package/'+(packname).substr(0, packname.length-4)+'-'+hash+'.tgz'}
             s3.putObject(opts, function(err, resp){
