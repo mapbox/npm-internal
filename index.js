@@ -11,6 +11,7 @@ if (!module.parent) {
     }
     else if(argv._[0] === 'publish') {
         packAndDeploy(argv._[1] || "", function(err, result) {
+            if (err) throw err;
             process.exit(result ? 0 : 1);
         });
     }
@@ -25,11 +26,17 @@ function packAndDeploy(path, callback){
     var packname = npmPackage.name+'-'+npmPackage.version+'.tgz';
 
     var s3 = new AWS.S3();
-
+    
     // iterate through packages, looking for any that exist w/ same name & version
     s3.listObjects({Bucket: process.env.NPMInternalBucket, Prefix: 'package/' + npmPackage.name}, function(err, data) {        
+        
+        if(err) callback(err);
+
         var conflict = data.Contents.some(function(bucketEntry) {
-            return (bucketEntry.Key.indexOf('package/' + npmPackage.name + '-' + npmPackage.version) > -1);
+            var bucketEntryMinusGitSha = bucketEntry.Key.split('-');
+            bucketEntryMinusGitSha.pop();
+            bucketEntryMinusGitSha = bucketEntryMinusGitSha.join('-');
+            return (bucketEntryMinusGitSha === 'package/' + npmPackage.name + '-' + npmPackage.version);
         });
 
         // conflicting name, error out w/ some friendly advice
@@ -40,7 +47,9 @@ function packAndDeploy(path, callback){
         }
         // roll package and upload to S3; emit package URL
         else {
-            npm.load(path, function(err){
+            npm.load(npmPackage, function(err){
+                if(err) callback(err);                
+                if (path === "") path = process.cwd();
                 npm.commands.pack([path], function(err){   
                     if(err) callback(err); 
                     console.log('Uploading Package to S3');
