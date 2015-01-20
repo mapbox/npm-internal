@@ -11,7 +11,7 @@ if (!module.parent) {
     }
     else if(argv._[0] === 'publish') {
         packAndDeploy(argv._[1] || "", function(err, result) {
-            //process.exit(result ? 0 : 1);
+            process.exit(result ? 0 : 1);
         });
     }
 }
