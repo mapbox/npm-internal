@@ -10,25 +10,23 @@ if (!module.parent) {
         fs.createReadStream(__dirname + '/usage.md').pipe(process.stdout);
     }
     else if(argv._[0] === 'publish') {
-        packAndDeploy(argv._[1] || "", function(err, result) {
+        packAndDeploy(new AWS.S3(), process.env.NPMInternalBucket, argv._[1] || "", function(err, result) {
             if (err) throw err;
             process.exit(result ? 0 : 1);
         });
     }
 }
 
-function packAndDeploy(path, callback){    
+function packAndDeploy(s3, bucket, path, callback){    
     var shasum = crypto.createHash('sha1');
     shasum.update((+(new Date()))+Math.random()+'');
     var hash = shasum.digest('hex');
 
     var npmPackage = require(((path !== "") ? path : process.cwd()) + '/package');
     var packname = npmPackage.name+'-'+npmPackage.version+'.tgz';
-
-    var s3 = new AWS.S3();
     
     // iterate through packages, looking for any that exist w/ same name & version
-    s3.listObjects({Bucket: process.env.NPMInternalBucket, Prefix: 'package/' + npmPackage.name}, function(err, data) {        
+    s3.listObjects({Bucket: bucket, Prefix: 'package/' + npmPackage.name}, function(err, data) {        
         
         if(err) callback(err);
 
@@ -55,7 +53,7 @@ function packAndDeploy(path, callback){
                     console.log('Uploading Package to S3');
                     var opts = {ACL: process.env.NPMInternalAcl || 'public-read',
                                 Body: fs.createReadStream(packname),
-                                Bucket: process.env.NPMInternalBucket,
+                                Bucket: bucket,
                                 Key: 'package/' + (packname).substr(0, packname.length-4) + '-' + hash + '.tgz'}
                     s3.putObject(opts, function(err, resp){
                         if(err) callback(err);

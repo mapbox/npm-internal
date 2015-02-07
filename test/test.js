@@ -1,29 +1,35 @@
 var tape = require('tape'),
-    AWS = require('aws-sdk'),
     npmi = require('../index.js'),
-    async = require('async');
+    async = require('async'),
+    fakeAWS = require('mock-aws-s3'),
+    bucket = __dirname + '/local';
 
-function deleteTestPackage(s3, packageName, callback) {
-    var bucket = process.env.NPMInternalBucket;
-    var deletions = [];
-
+function deleteTestPackage(s3, packageName, callback) {        
     var packagePrefix = packageName.split('-');
     packagePrefix.pop();
     packagePrefix = packagePrefix.join('-');
 
+    var to_delete = {
+        Bucket: bucket,
+        Delete: {
+            Objects: []
+        }
+    };
+
     s3.listObjects({Bucket: bucket, Prefix: 'package/' + packagePrefix}, function(err, data) {        
         data.Contents.forEach(function(bucketEntry) {
             if (bucketEntry.Key.indexOf('package/' + packageName) > -1) {                
-                deletions.push(function(cb){ s3.deleteObject({Bucket: bucket, Key: bucketEntry.Key}, cb) });
+                to_delete.Delete.Objects.push({ Key: bucketEntry.Key});
             }
         });
-        async.series(deletions, callback);
+        
+        s3.deleteObjects(to_delete, callback);
     });
 }
 
 tape('prefix collision test', function(t) {
     t.plan(3);
-    var s3 = new AWS.S3();
+    var s3 = new fakeAWS.S3();
     var tasks = [];
     tasks.push(function(cb) {
         deleteTestPackage(s3, 'npm-internal-prefix-test', cb);
@@ -32,13 +38,13 @@ tape('prefix collision test', function(t) {
         deleteTestPackage(s3, 'npm-internal-prefix-test-2', cb);
     });
     tasks.push(function(cb) {
-        npmi.packAndDeploy(process.cwd() + '/test/fixtures/npm-internal-prefix-test-2', function(err, result) {
+        npmi.packAndDeploy(s3, bucket, __dirname + '/fixtures/npm-internal-prefix-test-2', function(err, result) {            
             t.ok((!err && result), 'Uploaded prefix collision package 1 (e.g. maps-1.0.0)');
             cb();
         });
     });
     tasks.push(function(cb) {
-        npmi.packAndDeploy(process.cwd() + '/test/fixtures/npm-internal-prefix-test', function(err, result) {
+        npmi.packAndDeploy(s3, bucket, __dirname + '/fixtures/npm-internal-prefix-test', function(err, result) {
             t.ok((!err && result), 'Uploaded prefix collision package 2 (e.g. maps-1.0.0-dev) without conflict');
             cb();
         });
@@ -58,14 +64,14 @@ tape('prefix collision test', function(t) {
 tape('collision test', function(t) {
     t.plan(3);
 
-    var s3 = new AWS.S3();
+    var s3 = new fakeAWS.S3();
 
     // ensure a clean slate, then test
     deleteTestPackage(s3, 'npm-internal-collision-test-1.0.0', function() {
         async.series([
             function(cb) {
                 // pass the first time
-                npmi.packAndDeploy(process.cwd() + '/test/fixtures/npm-internal-collision-test', 
+                npmi.packAndDeploy(s3, bucket, __dirname + '/fixtures/npm-internal-collision-test',
                     function(err, result) { 
                         t.ok((!err && result), 'Uploaded test package successfully to a clean slate'); 
                         cb();
@@ -74,7 +80,7 @@ tape('collision test', function(t) {
             
             function(cb) {
                 // fail the second
-                npmi.packAndDeploy(process.cwd() + '/test/fixtures/npm-internal-collision-test', 
+                npmi.packAndDeploy(s3, bucket, __dirname + '/fixtures/npm-internal-collision-test',
                     function(err, result) { 
                         t.ok((!err && !result), 'Correctly failed to upload when existing package is present'); 
                         cb();
