@@ -1,6 +1,6 @@
 {
   "name": "npm-internal",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Publish npm modules to a private s3 bucket.",
   "main": "index.js",
   "bin": {
@@ -19,7 +19,7 @@
     "url": "https://github.com/mpabox/npm-internal/issues"
   },
   "homepage": "https://github.com/mapbox/npm-internal",
-  "dependencies": {    
+  "dependencies": {
     "aws-sdk": "^2.0.17",
     "minimist": "^1.1.0",
     "mock-aws-s3": "^0.2.4",
