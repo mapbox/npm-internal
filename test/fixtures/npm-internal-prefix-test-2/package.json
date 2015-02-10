@@ -1,0 +1,19 @@
+{
+  "name": "npm-internal-prefix-test-2",
+  "version": "1.0.0",
+  "description": "Test for prefix collision errors.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/npm-internal-collision-test.git"
+  },
+  "author": "tlee@mapbox.com",
+  "license": "MIT",
+  "homepage": "https://google.com/non-existent-project",
+  "dependencies": {
+    "async": "^0.9.0"
+  }
+}
