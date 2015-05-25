@@ -1,6 +1,6 @@
 {
   "name": "npm-internal",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Publish npm modules to a private s3 bucket.",
   "main": "index.js",
   "bin": {
@@ -26,5 +26,8 @@
     "npm": "^2.0.0",
     "queue-async": "^1.0.7",
     "tape": "^3.4.0"
+  },
+  "devDependencies": {
+    "rimraf": "^2.3.4"
   }
 }
