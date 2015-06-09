@@ -6,7 +6,7 @@ var tape = require('tape'),
     npmi = require('../index.js'),
     fakeAWS = require('mock-aws-s3'),
     rimraf = require('rimraf'),
-    exec = require('child_process').execSync,
+    exec = require('sync-exec'),
     bucket = __dirname + '/local';
 
 function deleteTestPackage(s3, packageName, callback) {
