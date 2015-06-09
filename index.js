@@ -3,7 +3,7 @@ var npm  = require('npm');
 var AWS = require('aws-sdk');
 var fs = require('fs');
 var crypto = require('crypto');
-var exec = require('child_process').execSync;
+var exec = require('sync-exec');
 var argv = require('minimist')(process.argv.splice(2));
 
 if (!module.parent) {
@@ -56,8 +56,9 @@ function packAndDeploy(s3, bucket, path, force, callback){
                     // if a git project, check for extra files
                     if (fs.existsSync(path+'/.git')) {
                         var non_git_files_present = [];
-                        var pack_file_list = exec("tar tvf " + packname + " | awk '{print $" + (process.platform === 'darwin' ? '9' : '6' )+  "}'").toString().split("\n").map(function(x) { return (x.replace(/^package\//, '').trim()); });
-                        var git_file_list = exec("git ls-files", {cwd: path}).toString().split("\n");
+                        var pack_file_list = exec("tar tvf " + packname + " | awk '{print $" + (process.platform === 'darwin' ? '9' : '6' )+  "}'").stdout.split("\n").map(function(x) { return (x.replace(/^package\//, '').trim()); }).filter(function(e) { return e.length>0; });
+                        var git_file_list = exec("git ls-files", {cwd: path}).stdout.split("\n").filter(function(e) { return e.length>0; });;
+
                         non_git_files_present = pack_file_list.reduce(function(out, pack_file) {
                             if ((git_file_list.indexOf(pack_file) === -1) && (pack_file !== packname))
                                 out.push(pack_file);
