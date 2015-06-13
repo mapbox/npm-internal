@@ -60,7 +60,7 @@ function packAndDeploy(s3, bucket, path, force, callback){
                         var git_file_list = exec("git ls-files", {cwd: path}).stdout.split("\n").filter(function(e) { return e.length>0; });;
 
                         non_git_files_present = pack_file_list.reduce(function(out, pack_file) {
-                            if ((git_file_list.indexOf(pack_file) === -1) && (pack_file !== packname))
+                            if ((git_file_list.indexOf(pack_file) === -1) && (pack_file !== packname) && (['.npmignore'].indexOf(pack_file)===-1))
                                 out.push(pack_file);
                             return out;
                         }, []);

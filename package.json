@@ -1,6 +1,6 @@
 {
   "name": "npm-internal",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Publish npm modules to a private s3 bucket.",
   "main": "index.js",
   "bin": {
