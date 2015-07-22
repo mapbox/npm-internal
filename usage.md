@@ -8,8 +8,6 @@ Expects the following Env vars:
   AWS_SECRET_ACCESS_KEY=<secret>
 ```
 
-The AWS authentication variables can also be set up using [mapbox-cli](https://github.com/mapbox/mapbox-cli).
-
 Optional:
 
   `NPMInternalAcl=public-read`  # set object acl on s3
@@ -18,4 +16,13 @@ Usage:
 
 `npm-internal publish`
 
-  This builds a npm package, and uploads it to your s3 bucket.
+ This builds a npm package, and uploads it to your s3 bucket.
+
+
+`npm-internal publish --dev`
+
+This builds a npm package, and uploads it to your s3 bucket. But names it using git descibe, for dev releases
+
+`npm-internal show <package name>`
+
+Lists the versions of package available in the s3 bucket. If packname is omited it uses the current directory if possible.
