@@ -157,4 +157,3 @@ tape('collision test', function(t) {
         });
     });
 });
-
