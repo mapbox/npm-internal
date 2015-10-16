@@ -33,6 +33,13 @@ function packAndDeploy(s3, bucket, path, force, callback){
     var hash = shasum.digest('hex');
     var npmPackage = require(path + '/package');
 
+    if (!npmPackage.name) {
+        return callback(new Error('package.json must contain "name"'));
+    }
+    if (!npmPackage.version) {
+        return callback(new Error('package.json must contain "version"'));
+    }
+
     var packname = npmPackage.name+'-'+npmPackage.version+'.tgz';
 
     var describe = null;
