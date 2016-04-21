@@ -46,7 +46,7 @@ function packAndDeploy(s3, bucket, path, force, callback){
     if(argv.dev) {
         if (fs.existsSync(path+'/.git')) {
             describe = exec("git describe --tags", {cwd: path}).stdout.replace('\n', '');
-            describe = describe || 'v0.0.0-' + exec('git rev-parse head', {cwd: path}).stdout.replace('\n', '');
+            describe = describe || 'v' + npmPackage.version + '-' + exec('git rev-parse HEAD', {cwd: path}).stdout.replace('\n', '');
             console.log('dev publish: '+ npmPackage.name+'-'+describe)
         } else {
             return callback(new Error('to use --dev this has to be a git repo'));
