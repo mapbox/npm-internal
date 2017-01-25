@@ -40,34 +40,36 @@ function packAndDeploy(s3, bucket, path, force, callback){
         return callback(new Error('package.json must contain "version"'));
     }
 
-    var packname = npmPackage.name+'-'+npmPackage.version+'.tgz';
+    // rename package if scoped module
+    var basepackname = npmPackage.name[0] === '@' ? npmPackage.name.substr(1).replace(/\//g, '-') : npmPackage.name;
+    var packname = basepackname+'-'+npmPackage.version+'.tgz';
 
     var describe = null;
     if(argv.dev) {
         if (fs.existsSync(path+'/.git')) {
             describe = exec("git describe --tags", {cwd: path}).stdout.replace('\n', '');
             describe = describe || 'v' + npmPackage.version + '-' + exec('git rev-parse HEAD', {cwd: path}).stdout.replace('\n', '');
-            console.log('dev publish: '+ npmPackage.name+'-'+describe)
+            console.log('dev publish: '+ basepackname +'-'+describe)
         } else {
             return callback(new Error('to use --dev this has to be a git repo'));
         }
     }
 
     // iterate through packages, looking for any that exist w/ same name & version
-    s3.listObjects({Bucket: bucket, Prefix: 'package/' + npmPackage.name}, function(err, data) {
+    s3.listObjects({Bucket: bucket, Prefix: 'package/' + basepackname}, function(err, data) {
         if(err) callback(err);
 
         var conflict = data.Contents.some(function(bucketEntry) {
             var bucketEntryMinusGitSha = bucketEntry.Key.split('-');
             bucketEntryMinusGitSha.pop();
             bucketEntryMinusGitSha = bucketEntryMinusGitSha.join('-');
-            return (bucketEntryMinusGitSha === 'package/' + npmPackage.name + '-' + (describe || npmPackage.version));
+            return (bucketEntryMinusGitSha === 'package/' + basepackname + '-' + (describe || npmPackage.version));
         });
 
         // conflicting name, error out w/ some friendly advice
         if (conflict) {
             console.error('');
-            console.error(npmPackage.name + '-' + (describe || npmPackage.version) + ' already exists.');
+            console.error(basepackname + '-' + (describe || npmPackage.version) + ' already exists.');
             console.error('Please either increment the version number in package.json to remove the conflict and try again.');
             console.error('Or for a dev package use --dev');
             callback(null, false);
@@ -103,7 +105,7 @@ function packAndDeploy(s3, bucket, path, force, callback){
                     var opts = {ACL: process.env.NPMInternalAcl || 'public-read',
                                 Body: fs.createReadStream(packname),
                                 Bucket: bucket,
-                                Key: 'package/' + npmPackage.name + '-' + (describe || npmPackage.version) + '-' + hash + '.tgz'}
+                                Key: 'package/' + basepackname + '-' + (describe || npmPackage.version) + '-' + hash + '.tgz'}
 
                     s3.putObject(opts, function(err, resp){
                         if(err) callback(err);
