@@ -157,3 +157,39 @@ tape('collision test', function(t) {
         });
     });
 });
+
+tape('scoped package test', function(t) {
+    t.plan(3);
+
+    var s3 = new fakeAWS.S3();
+
+    // ensure a clean slate, then test
+    deleteTestPackage(s3, 'org-npm-internal-scoped-1.0.0', function() {
+        var tasks = [];
+
+        tasks.push(function(cb) {
+                // pass the first time
+                npmi.packAndDeploy(s3, bucket, __dirname + '/fixtures/npm-internal-scoped', false,
+                    function(err, result) {
+                        t.ok((!err && result), 'Uploaded test package successfully to a clean slate');
+                        cb();
+                    });
+            });
+
+        tasks.push(function(cb) {
+                // fail the second
+                npmi.packAndDeploy(s3, bucket, __dirname + '/fixtures/npm-internal-scoped', false,
+                    function(err, result) {
+                        t.ok((!err && !result), 'Correctly failed to upload when existing package is present');
+                        cb();
+                    });
+            });
+
+        var q = queue(1);
+        tasks.forEach(function(task) { q.defer(task); });
+        q.awaitAll(function(err, result) {
+            // clean up after ourselves
+            deleteTestPackage(s3, 'org-npm-internal-scoped-1.0.0', function() { t.pass('Cleaned up after ourselves'); });
+        });
+    });
+});

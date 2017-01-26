@@ -1,0 +1,19 @@
+{
+  "name": "@org/npm-internal-scoped",
+  "version": "1.0.0",
+  "description": "Test a scoped package.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/npm-internal-scoped.git"
+  },
+  "author": "tlee@mapbox.com",
+  "license": "MIT",
+  "homepage": "https://google.com/non-existent-project",
+  "dependencies": {
+    "async": "^0.9.0"
+  }
+}
