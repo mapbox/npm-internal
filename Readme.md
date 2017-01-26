@@ -43,3 +43,11 @@ need a link to a current or past version. npm-internal show
 0.0.0 https://{BUCKET}.s3.amazonaws.com/package/npm-package-0.0.0-e84b5cf2ebc818b602885a9e0d7b351b8a9928d1.tgz
 0.0.1 https://{BUCKET}.s3.amazonaws.com/package/npm-package-0.0.1-e84b5cf2ebc818b602885a9e0d7b351b8a9928d1.tgz
 ```
+
+### scoped modules
+
+All scoped modules (@org/module-name) take the following naming scheme (inherited from npm pack):
+
+```
+https://{BUCKET}.s3.amazonaws.com/package/org-module-name-v1.0.0-e84b5cf2ebc818b602885a9e0d7b351b8a9928d1.tgz
+```
